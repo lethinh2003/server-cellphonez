@@ -16,6 +16,8 @@ const adminRouters = require("./routers/admin_routers");
 const danhMucRouters = require("./routers/danhmuc_routers");
 const sanPhamRouters = require("./routers/sanpham_routers");
 const cauHinhRouters = require("./routers/cauhinh_routers");
+const donHangRouters = require("./routers/donhang_routers");
+
 const cors = require("cors");
 //MIDDLEWARE
 app.use(cors());
@@ -59,6 +61,7 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
   res.status(200).send("404 Not Found");
 });
+app.use("/api/v1/donhang", donHangRouters);
 app.use("/api/v1/cauhinh", cauHinhRouters);
 app.use("/api/v1/danhmuc", danhMucRouters);
 app.use("/api/v1/sanpham", sanPhamRouters);
