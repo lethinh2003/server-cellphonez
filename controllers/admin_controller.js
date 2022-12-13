@@ -1,4 +1,5 @@
 const SanPham = require("../models/SanPham");
+const DonHang = require("../models/DonHang");
 
 const AppError = require("../utils/app_error");
 const sendEmail = require("../utils/email");
@@ -98,22 +99,19 @@ exports.createSanPham = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.getOverview = catchAsync(async (req, res, next) => {
-//   const getOrders = HistoryCode.find({}).select("-__v");
-//   const getOrdersSuccess = HistoryCode.find({ status: "success" }).select("-__v");
-//   const getOrdersPending = HistoryCode.find({ status: "pending" }).select("-__v");
-//   const getSourcesCode = Code.find({ status: true }).select("-__v -link");
-//   const getUsers = User.find({ status: true }).select("-__v -password");
+exports.getOverview = catchAsync(async (req, res, next) => {
+  const getTatCaSanPham = SanPham.find({}).select("-__v");
+  const getSanPhamSale = SanPham.find({ isSale: true }).select("-__v");
+  const getTatCaDonHang = DonHang.find({}).select("-__v");
 
-//   await Promise.all([getOrders, getOrdersSuccess, getSourcesCode, getUsers]).then((data) => {
-//     return res.status(200).json({
-//       status: "success",
-//       data: [
-//         { key: "orders", title: "Đơn Hàng", value: data[0].length },
-//         { key: "ordersSuccess", title: "Thành Công", value: data[1].length },
-//         { key: "sourcesCode", title: "Source Code", value: data[2].length },
-//         { key: "users", title: "Người Dùng HĐ", value: data[3].length },
-//       ],
-//     });
-//   });
-// });
+  await Promise.all([getTatCaSanPham, getSanPhamSale, getTatCaDonHang]).then((data) => {
+    return res.status(200).json({
+      status: "success",
+      data: [
+        { key: "tatCaSanPham", title: "Sản phẩm", value: data[0].length },
+        { key: "sanPhamSale", title: "Sản phẩm sale", value: data[1].length },
+        { key: "donHang", title: "Đơn hàng", value: data[2].length },
+      ],
+    });
+  });
+});
