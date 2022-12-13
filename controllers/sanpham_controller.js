@@ -2,7 +2,6 @@ const SanPham = require("../models/SanPham");
 const DanhMuc = require("../models/DanhMuc");
 const AppError = require("../utils/app_error");
 const catchAsync = require("../utils/catch_async");
-
 exports.getAllSanPham = catchAsync(async (req, res, next) => {
   const findSanPham = await SanPham.find({}).sort("_id").select("-__v").populate({
     path: "danhMuc",
@@ -11,6 +10,52 @@ exports.getAllSanPham = catchAsync(async (req, res, next) => {
     status: "success",
     results: findSanPham.length,
     data: findSanPham,
+  });
+});
+exports.getSearchSanPham = catchAsync(async (req, res, next) => {
+  const query = req.query.query;
+
+  const loaiDanhMuc = req.query.loaiDanhMuc || "all";
+  const page = req.query.page * 1 || 1;
+  const results = req.query.results * 1 || 10;
+  const sorts = req.query.sorts || "_id";
+  const skip = (page - 1) * results;
+  let findSanPham = [];
+  if (loaiDanhMuc === "all") {
+    findSanPham = await SanPham.find({
+      tenSanPham: new RegExp(query, "i"),
+    })
+      .skip(skip)
+      .limit(results)
+      .sort(sorts)
+      .select("-__v")
+      .populate({
+        path: "danhMuc",
+      });
+  } else {
+    findSanPham = await SanPham.find({
+      tenSanPham: new RegExp(query, "i"),
+      danhMuc: loaiDanhMuc,
+    })
+      .skip(skip)
+      .limit(results)
+      .sort(sorts)
+      .select("-__v")
+      .populate({
+        path: "danhMuc",
+      });
+  }
+  return res.status(200).json({
+    status: "success",
+    results: findSanPham.length,
+    data: findSanPham,
+    meta: {
+      page: page,
+      results: results,
+      sorts,
+      query,
+      loaiDanhMuc,
+    },
   });
 });
 
